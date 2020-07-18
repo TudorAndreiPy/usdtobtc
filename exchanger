@@ -1,0 +1,62 @@
+import bs4 #import beautiful soup 4
+import requests #import request
+from bs4 import BeautifulSoup # import BeautifulSoup
+from tkinter import *  #import tkinter
+from tkinter import messagebox #import tkinter with messagebox
+
+root = Tk()
+root.title("Stock prices app")
+root.geometry("+255+50")
+root.configure(bg = '#97d369')
+bg = '#97d369'
+
+titlelbl = Label(root, text = "Bitcoin exchange" , bg = bg)
+titlelbl.config(font=("Century 16"))
+titlelbl.grid(row = 0 , columnspan = 2)
+
+########### USD ###########
+usd_label_text = Label(root, text = "USD:" , bg = bg)
+usd_label_text.config(font=("Arial 15"))
+usd_label_text.grid(row = 1, column = 0)
+
+usd_entry_text = Entry(root, width = 30, borderwidth = 0, bg = 'white', fg = 'black')
+usd_entry_text.grid(row = 1 , column = 1 , padx = (0,10))
+
+########### BTC ###########
+
+bitcoin_label_text = Label(root, text = "BTC:" , bg = bg)
+bitcoin_label_text.config(font=("Arial 15"))
+bitcoin_label_text.grid(row = 2, column = 0)
+
+bitcoin_entry_text = Entry(root, width = 30, borderwidth = 0, bg = 'white', fg = 'black')
+bitcoin_entry_text.grid(row = 2 , column = 1 , padx = (0,10))
+
+###########################
+
+def getMeIt():
+
+	link = requests.get('https://finance.yahoo.com/quote/BTC-USD?p=BTC-USD&.tsrc=fin-srch')# link for bitcoin stock price
+	soup = bs4.BeautifulSoup(link.text, "lxml")
+	price = soup.find_all('div', {'class' : 'D(ib) smartphone_Mb(10px) W(70%) W(100%)--mobp smartphone_Mt(6px)'})[0].find('span').text # here i take the price for bitcoin
+
+	price = price.replace(',', '')
+	price = float(price)
+
+	usd_value = float(usd_entry_text.get())
+	result = usd_value / price
+	bitcoin_entry_text.delete(0,END)
+	bitcoin_entry_text.insert(0, f"%.7f" % result)
+
+	pricelbl = Label(root, text = f"The price for 1 BTC is {price}$" , font = ("Arial 11 bold") , bg = bg)
+	pricelbl.grid(row = 4, columnspan = 2 , pady = (0,10))
+
+	return
+
+######### BUTTON ##########
+
+iwant = Button(root, text = "Transform!", font = ("Arial 8 bold") , command = getMeIt)
+iwant.grid(row = 3 , pady = 10 , columnspan = 2)
+
+############################
+
+root.mainloop()
